@@ -4,10 +4,19 @@ import { useState, useEffect } from 'react'
 import { fetchRecipes } from '@/lib/api'
 import RecipeCard from './RecipeCard'
 
+interface Recipe {
+  id: number
+  name: string
+  image: string
+  rating: number
+  difficulty: string
+  cuisine: string
+}
+
 export default function RecipesList() {
   const LIMIT = 9
 
-  const [recipes, setRecipes] = useState<any[]>([])
+  const [recipes, setRecipes] = useState<Recipe[]>([])
   const [page, setPage] = useState(0)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -15,11 +24,11 @@ export default function RecipesList() {
 
   const [searchTerm, setSearchTerm] = useState('')
   const [debouncedTerm, setDebouncedTerm] = useState('')
-  const [filteredRecipes, setFilteredRecipes] = useState<any[]>([])
+  const [filteredRecipes, setFilteredRecipes] = useState<Recipe[]>([])
   const [isSearching, setIsSearching] = useState(false)
 
   const [selectedCuisine, setSelectedCuisine] = useState<string | null>(null)
-const [selectedDifficulty, setSelectedDifficulty] = useState<string | null>(null)
+  const [selectedDifficulty, setSelectedDifficulty] = useState<string | null>(null)
 
 
   //  Debounce search input
@@ -60,7 +69,7 @@ const [selectedDifficulty, setSelectedDifficulty] = useState<string | null>(null
 
       try {
         const { recipes: all } = await fetchRecipes(100, 0)
-        const matched = all.filter((r: any) =>
+        const matched = all.filter((r: Recipe) =>
           r.name.toLowerCase().includes(debouncedTerm.toLowerCase())
         )
         setFilteredRecipes(matched)
@@ -87,15 +96,16 @@ const [selectedDifficulty, setSelectedDifficulty] = useState<string | null>(null
     )
   }
     
-  const filteredBySearch = debouncedTerm ? filteredRecipes : recipes;
+  const filteredBySearch = debouncedTerm
+    ? recipes.filter((r: Recipe) => r.name.toLowerCase().includes(debouncedTerm.toLowerCase()))
+    : recipes
 
-
-const visibleRecipes = filteredBySearch.filter((r) => {
-  return (
-    (!selectedCuisine || r.cuisine === selectedCuisine) &&
-    (!selectedDifficulty || r.difficulty === selectedDifficulty)
-  )
-})
+  const visibleRecipes = filteredBySearch.filter((r: Recipe) => {
+    return (
+      (!selectedCuisine || r.cuisine === selectedCuisine) &&
+      (!selectedDifficulty || r.difficulty === selectedDifficulty)
+    )
+  })
 
   //  Empty state
   if (!visibleRecipes.length && !isLoading && !isSearching) {
@@ -190,5 +200,5 @@ const visibleRecipes = filteredBySearch.filter((r) => {
       )}
     </>
   )
-}  
+}
 

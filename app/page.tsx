@@ -1,5 +1,16 @@
 import { fetchRecipes } from '@/lib/api'
 import Link from 'next/link'
+import Image from 'next/image'
+
+// Define Recipe type
+interface Recipe {
+  id: number
+  name: string
+  image: string
+  rating: number
+  difficulty: string
+  cuisine: string
+}
 
 export default async function HomePage() {
   const { recipes } = await fetchRecipes(3, 0) // top 3 for preview
@@ -26,7 +37,7 @@ export default async function HomePage() {
       <section className="mb-16">
         <h2 className="text-2xl font-semibold mb-6 text-center">Featured Recipes</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {recipes.map((recipe:any) => (
+          {recipes.map((recipe: Recipe) => (
             <Link
               key={recipe.id}
               href={`/recipes/${recipe.id}`}
@@ -34,8 +45,9 @@ export default async function HomePage() {
             >
               <div
                 className="h-48 bg-cover bg-center"
-                style={{ backgroundImage: `url(${recipe.image})` }}
-              />
+              >
+                <Image src={recipe.image} alt={recipe.name} width={400} height={192} className="w-full h-48 object-cover" />
+              </div>
               <div className="p-4 bg-white dark:bg-gray-800">
                 <h3 className="text-lg font-semibold mb-2 text-gray-800 dark:text-white">
                   {recipe.name}
@@ -51,7 +63,7 @@ export default async function HomePage() {
 
       {/* Footer */}
       <footer className="text-center text-sm text-gray-500 mt-12">
-        Made by <span className="font-medium text-blue-600">[Rahul Kumar]</span> ·{' '}
+        Made by <span className="font-medium text-blue-600">[Rahul Kumar]</span> &middot;{' '}
         <Link href="/recipes" className="underline">
           Explore More
         </Link>

@@ -1,11 +1,23 @@
-
 import { fetchRecipes } from '@/lib/api'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 
+// Define Recipe type
+interface Recipe {
+  id: number
+  name: string
+  image: string
+  rating: number
+  difficulty: string
+  cuisine: string
+  prepTimeMinutes?: number
+  ingredients: string[]
+  instructions: string[]
+}
+
 async function getPostOr404(id: string) {
   const data = await fetchRecipes(100, 0);
-  const recipe = data.recipes.find((recipe: any) => recipe.id === Number(id));
+  const recipe = data.recipes.find((recipe: Recipe) => recipe.id === Number(id));
   if (!recipe) notFound();
   return recipe;
 }
@@ -20,7 +32,7 @@ export async function generateMetadata({ params }: { params: { id: string } }) {
 
 export async function generateStaticParams() {
   const data = await fetchRecipes(100, 0);
-  return data.recipes.map((recipe: any) => ({
+  return data.recipes.map((recipe: Recipe) => ({
     id: recipe.id.toString(),
   }))
 }
