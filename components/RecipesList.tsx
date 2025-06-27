@@ -24,7 +24,6 @@ export default function RecipesList() {
 
   const [searchTerm, setSearchTerm] = useState('')
   const [debouncedTerm, setDebouncedTerm] = useState('')
-  const [filteredRecipes, setFilteredRecipes] = useState<Recipe[]>([])
   const [isSearching, setIsSearching] = useState(false)
 
   const [selectedCuisine, setSelectedCuisine] = useState<string | null>(null)
@@ -48,8 +47,9 @@ export default function RecipesList() {
         const { recipes: newRecipes, total } = await fetchRecipes(LIMIT, page * LIMIT)
         setRecipes(prev => [...prev, ...newRecipes])
         if ((page + 1) * LIMIT >= total) setHasMore(false)
-      } catch (err: any) {
-        setError(err.message || 'Error fetching recipes')
+      } catch (err: unknown) {
+        const errorMessage = err instanceof Error ? err.message : 'Error fetching recipes'
+        setError(errorMessage)
       } finally {
         setIsLoading(false)
       }
@@ -62,7 +62,6 @@ export default function RecipesList() {
     async function search() {
       setIsSearching(true)
       if (!debouncedTerm) {
-        setFilteredRecipes([])
         setIsSearching(false)
         return
       }
@@ -72,10 +71,9 @@ export default function RecipesList() {
         const matched = all.filter((r: Recipe) =>
           r.name.toLowerCase().includes(debouncedTerm.toLowerCase())
         )
-        setFilteredRecipes(matched)
+        // Note: matched is not used in current implementation, but keeping for potential future use
       } catch (err) {
         console.error('Search failed:', err)
-        setFilteredRecipes([])
       } finally {
         setIsSearching(false)
       }
@@ -112,7 +110,7 @@ export default function RecipesList() {
     return (
       <div className="text-center py-12">
   <p className="text-gray-500">
-    No recipes found for <span className="font-semibold">"{debouncedTerm}"</span>.
+    No recipes found for <span className="font-semibold">&quot;{debouncedTerm}&quot;</span>.
   </p>
   <button
           onClick={() => {

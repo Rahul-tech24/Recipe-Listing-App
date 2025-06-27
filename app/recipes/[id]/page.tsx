@@ -22,8 +22,9 @@ async function getPostOr404(id: string) {
   return recipe;
 }
 
-export async function generateMetadata({ params }: { params: { id: string } }) {
-  const recipe = await getPostOr404(params.id);
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const recipe = await getPostOr404(id);
   return {
     title: recipe.name,
     description: recipe.cuisine,
@@ -37,8 +38,9 @@ export async function generateStaticParams() {
   }))
 }
 
-export default async function Page({ params }: { params: { id: string } }) {
-  const recipe = await getPostOr404(params.id);
+export default async function Page({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const recipe = await getPostOr404(id);
 
   return (
     <article className="max-w-3xl mx-auto py-16 px-4">
