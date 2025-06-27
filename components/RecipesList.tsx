@@ -68,10 +68,10 @@ export default function RecipesList() {
 
       try {
         const { recipes: all } = await fetchRecipes(100, 0)
-        const matched = all.filter((r: Recipe) =>
+        // Filter recipes by search term (not used in current implementation)
+        all.filter((r: Recipe) =>
           r.name.toLowerCase().includes(debouncedTerm.toLowerCase())
         )
-        // Note: matched is not used in current implementation, but keeping for potential future use
       } catch (err) {
         console.error('Search failed:', err)
       } finally {
